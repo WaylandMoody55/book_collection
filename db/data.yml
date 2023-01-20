@@ -1,0 +1,30 @@
+
+---
+ar_internal_metadata:
+  columns:
+  - key
+  - value
+  - created_at
+  - updated_at
+  records: 
+  - - environment
+    - development
+    - 2023-01-19 15:21:48.429041000 Z
+    - 2023-01-19 15:21:48.429041000 Z
+
+---
+books:
+  columns:
+  - id
+  - title
+  - created_at
+  - updated_at
+  records: 
+  - - 2
+    - The Freeze Network
+    - 2023-01-19 23:18:38.613759000 Z
+    - 2023-01-19 23:18:38.613759000 Z
+  - - 3
+    - Hello world
+    - 2023-01-20 14:21:54.855659000 Z
+    - 2023-01-20 14:21:54.855659000 Z
