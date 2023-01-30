@@ -1,6 +1,14 @@
 Rails.application.routes.draw do
-  resources :books
-  get "/books/index", to: "books#index", as: 'books'
+  root "books#index"
+  resources :books do
+    member do 
+      get :delete
+    end
+  end
+  
+  
+
+  # get "/books/index", to: "books#index", as: 'books'
   # get 'books/new'
   # get 'books/edit'
   # get 'books/show'
