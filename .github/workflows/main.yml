@@ -1,46 +1,41 @@
-name: CI/CD
+env:
+  RUBY_VERSION: 3.0.2
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: password
+  DATABASE_USER: postgres
+  DATABASE_PASSWORD: password
+
+name: Rails tests
 on: [push, pull_request]
 jobs:
-  build:
+  rspec-test:
+    name: RSpec
     runs-on: ubuntu-latest
-    
     services:
-      db:
-        image: postgres:11
-        ports: ["5432:5432"]
+      postgres:
+        image: postgres:12
+        ports:
+        - 5432:5432
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      redis:
-        image: redis
-        ports: ["6379:6379"]
-        options: --entrypoint redis-server
-
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Ruby
-        uses: actions/setup-ruby@v1
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.3.x
+          ruby-version: ${{ env.RUBY_VERSION }}
+      - name: Install postgres client
+        run: sudo apt-get install libpq-dev
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundler install
+      - name: Create database
+        run: |
+          bundler exec rails db:create RAILS_ENV=test
+          bundler exec rails db:migrate RAILS_ENV=test
       - uses: borales/actions-yarn@v2.0.0
         with:
           cmd: install
-      - name: Build and run test
-        env:
-          DATABASE_URL: postgres://postgres:@localhost:5432/test
-          REDIS_URL: redis://localhost:6379/0
-          RAILS_ENV: test
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        run: |
-          sudo apt-get -yqq install libpq-dev
-          gem install bundler
-          bundle install --jobs 4 --retry 3
-          bundle exec rake db:create
-          bundle exec rake db:migrate
-          bundle exec rspec .
+      - name: Run tests
+        run: bundler exec rspec .
